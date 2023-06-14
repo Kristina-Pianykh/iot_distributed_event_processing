@@ -1,17 +1,24 @@
 #include <HTTPClient.h>
+#include "ESPAsyncWebServer.h"
 #include <WiFi.h>
 #include <SPI.h>
 #include <ctime>
 #include "config.h"
 
-
+// home Wi-Fi config
 const char* ssid = "Beta Centauri";
 const char* password = "HEtV24c7j6vz";
 const char* serverURL = "http://192.168.0.6:8000";
 
+// Iphone hotspot config
+// const char* ssid = "iPhone (Kris)";
+// const char* password = "123456789km";
+// const char* serverURL = "http://172.20.10.6:8000";
 
-HTTPClient httpClient;
+
+AsyncWebServer server(80);
 TTGOClass *ttgo_watch;
+HTTPClient httpClient;
 
 // for rotation sensors
 TFT_eSPI *tft;
@@ -184,56 +191,13 @@ void setup_sensors(TTGOClass *ttgo_watch) {
 
   // Accel parameter structure
   Acfg cfg;
-  /*!
-      Output data rate in Hz, Optional parameters:
-          - BMA4_OUTPUT_DATA_RATE_0_78HZ
-          - BMA4_OUTPUT_DATA_RATE_1_56HZ
-          - BMA4_OUTPUT_DATA_RATE_3_12HZ
-          - BMA4_OUTPUT_DATA_RATE_6_25HZ
-          - BMA4_OUTPUT_DATA_RATE_12_5HZ
-          - BMA4_OUTPUT_DATA_RATE_25HZ
-          - BMA4_OUTPUT_DATA_RATE_50HZ
-          - BMA4_OUTPUT_DATA_RATE_100HZ
-          - BMA4_OUTPUT_DATA_RATE_200HZ
-          - BMA4_OUTPUT_DATA_RATE_400HZ
-          - BMA4_OUTPUT_DATA_RATE_800HZ
-          - BMA4_OUTPUT_DATA_RATE_1600HZ
-  */
   cfg.odr = BMA4_OUTPUT_DATA_RATE_100HZ;
-  /*!
-      G-range, Optional parameters:
-          - BMA4_ACCEL_RANGE_2G
-          - BMA4_ACCEL_RANGE_4G
-          - BMA4_ACCEL_RANGE_8G
-          - BMA4_ACCEL_RANGE_16G
-  */
   cfg.range = BMA4_ACCEL_RANGE_2G;
-  /*!
-      Bandwidth parameter, determines filter configuration, Optional parameters:
-          - BMA4_ACCEL_OSR4_AVG1
-          - BMA4_ACCEL_OSR2_AVG2
-          - BMA4_ACCEL_NORMAL_AVG4
-          - BMA4_ACCEL_CIC_AVG8
-          - BMA4_ACCEL_RES_AVG16
-          - BMA4_ACCEL_RES_AVG32
-          - BMA4_ACCEL_RES_AVG64
-          - BMA4_ACCEL_RES_AVG128
-  */
   cfg.bandwidth = BMA4_ACCEL_NORMAL_AVG4;
-
-  /*! Filter performance mode , Optional parameters:
-      - BMA4_CIC_AVG_MODE
-      - BMA4_CONTINUOUS_MODE
-  */
   cfg.perf_mode = BMA4_CONTINUOUS_MODE;
 
   // Configure the BMA423 accelerometer
   sensor->accelConfig(cfg);
-
-  // Enable BMA423 accelerometer
-  // Warning : Need to use feature, you must first enable the accelerometer
-  // Warning : Need to use feature, you must first enable the accelerometer
-  // Warning : Need to use feature, you must first enable the accelerometer
   sensor->enableAccel();
 }
 
@@ -277,10 +241,28 @@ void setup() {
   synchronize_time(ttgo_watch);
   
   delay(5000); // Wait for 5 seconds before sending the next request
+  server.on(
+    "/post",
+    HTTP_POST,
+    [](AsyncWebServerRequest * request){},
+    NULL,
+    [](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+
+      Serial.println("Incoming request:");
+      for (size_t i = 0; i < len; i++) {
+        Serial.write(data[i]);
+      }
+
+      Serial.println();
+
+      request->send(200);
+  });
+  server.begin();
+  Serial.println("HTTP server started");
 }
 
 void loop() {
     lv_task_handler();
     sensor_event_handler();
-    delay(5);
+    // server.handleClient();
 }

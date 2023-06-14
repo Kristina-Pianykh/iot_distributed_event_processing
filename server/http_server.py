@@ -1,8 +1,10 @@
 import datetime
 import json
 
+import httpx
 from fastapi import FastAPI, Request
 
+watch_url = "http://192.168.0.7/post"
 app = FastAPI()
 
 
@@ -15,4 +17,15 @@ async def root(request: Request):
     # print(decoded_message["Time"].strftime("%Y-%m-%d %H:%M:%S"))
 
     print(decoded_message)
+
+    # Send a request to the watch
+    payload = json.dumps({"Data": "Hello from the server"})
+    headers = {"Content-Type": "application/json"}
+    response = httpx.post(watch_url, data=payload, headers=headers, timeout=5)
+
+    if response.status_code == 200:
+        print("Request sent to watch successfully")
+    else:
+        print("Failed to send request to watch")
+
     return await request.json()
