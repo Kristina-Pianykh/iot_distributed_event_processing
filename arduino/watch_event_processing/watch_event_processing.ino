@@ -1,14 +1,17 @@
 #include <HTTPClient.h>
+#include <WiFiServer.h>
 #include "ESPAsyncWebServer.h"
 #include <WiFi.h>
 #include <SPI.h>
-#include <ctime>
 #include "config.h"
+#include "sensors.h"
+#include "http_requests.h"
+#include "lvgl.h"
 
 // home Wi-Fi config
 const char* ssid = "Beta Centauri";
 const char* password = "HEtV24c7j6vz";
-const char* serverURL = "http://192.168.0.6:8000";
+// const char* serverURL = "http://192.168.0.6:8000";
 
 // Iphone hotspot config
 // const char* ssid = "iPhone (Kris)";
@@ -19,10 +22,6 @@ const char* serverURL = "http://192.168.0.6:8000";
 AsyncWebServer server(80);
 TTGOClass *ttgo_watch;
 
-// for rotation sensors
-TFT_eSPI *tft;
-BMA *sensor;
-uint8_t prevRotation;
 
 // for time synchronization
 const char *ntpServer       = "pool.ntp.org";
@@ -30,135 +29,6 @@ const long  gmtOffset_sec   = 3600;
 const int   daylightOffset_sec = 3600;
 // Global variable to store the synchronized time
 PCF8563_Class *rtc; //real time clock
-uint8_t hh, mm, ss, mmonth, dday; // H, M, S variables
-uint16_t yyear; // Year is 16 bit int
-RTC_Date tnow;
-
-
-void sendHTTPRequest(String requestBody) {
-  if (WiFi.status() == WL_CONNECTED) {
-    // Set the target URL
-    httpClient.begin(serverURL);
-
-    // Set the Content-Type header
-    httpClient.addHeader("Content-Type", "application/json");
-    
-    // Send the HTTP POST request
-    int httpResponseCode = httpClient.POST(requestBody);
-    
-    // Handle the response
-    if (httpResponseCode > 0) {
-      String response = httpClient.getString();
-      Serial.println(httpResponseCode);
-      Serial.println(response);
-    } else {
-      Serial.println("Error on HTTP request");
-    }
-      
-    // Free resources
-    httpClient.end();
-  }
-}
-
-String format_request_payload(String eventType, RTC_Date tnow) {
-  hh = tnow.hour;
-  mm = tnow.minute;
-  ss = tnow.second;
-  mmonth = tnow.month;
-  dday = tnow.day;
-  yyear = tnow.year;
-
-  String message = "{\"Event\": \"" + eventType + "\", \"Year\": \"" + String(yyear) + "\", \"Month\": \"" + String(mmonth) + "\", \"Day\": \"" + String(dday) + "\", \"Hour\": \"" + String(hh) + "\", \"Minute\": \"" + String(mm) + "\", \"Seconds\": \"" + String(ss) + "\"}";
-  return message;
-}
-
-static void click_event_handler(lv_obj_t *obj, lv_event_t event)
-{
-    if (event == LV_EVENT_CLICKED) {
-        tnow = ttgo_watch->rtc->getDateTime();
-        Serial.println(format_request_payload("Clicked", tnow));
-        sendHTTPRequest(format_request_payload("Clicked", tnow));
-        Serial.printf("Clicked\n");
-
-    } else if (event == LV_EVENT_VALUE_CHANGED) {
-        tnow = ttgo_watch->rtc->getDateTime();
-        Serial.println(format_request_payload("Toggled", tnow));
-        sendHTTPRequest(format_request_payload("Toggled", tnow));
-        Serial.printf("Toggled\n");
-    }
-}
-
-static void sensor_event_handler() {
-  // Obtain the BMA423 direction,
-  // so that the screen orientation is consistent with the sensor
-  uint8_t rotation = sensor->direction();
-  if (prevRotation != rotation) {
-      prevRotation = rotation;
-      // Serial.printf("tft:%u sens:%u ", tft->getRotation(), rotation);
-      switch (rotation) {
-      case DIRECTION_DISP_DOWN:
-          //No use
-          break;
-      case DIRECTION_DISP_UP:
-          //No use
-          break;
-      case DIRECTION_BOTTOM_EDGE:
-          Serial.printf("WATCH_SCREEN_BOTTOM_EDGE\n");
-          tnow = ttgo_watch->rtc->getDateTime();
-          Serial.println(format_request_payload("WATCH_SCREEN_BOTTOM_EDGE", tnow));
-          sendHTTPRequest(format_request_payload("WATCH_SCREEN_BOTTOM_EDGE", tnow));
-          tft->setRotation(WATCH_SCREEN_BOTTOM_EDGE);
-          break;
-      case DIRECTION_TOP_EDGE:
-          Serial.printf("WATCH_SCREEN_TOP_EDGE\n");
-          tnow = ttgo_watch->rtc->getDateTime();
-          Serial.println(format_request_payload("WATCH_SCREEN_TOP_EDGE", tnow));
-          sendHTTPRequest(format_request_payload("WATCH_SCREEN_TOP_EDGE", tnow));
-          tft->setRotation(WATCH_SCREEN_TOP_EDGE);
-          break;
-      case DIRECTION_RIGHT_EDGE:
-          Serial.printf("WATCH_SCREEN_RIGHT_EDGE\n");
-          tnow = ttgo_watch->rtc->getDateTime();
-          Serial.println(format_request_payload("WATCH_SCREEN_RIGHT_EDGE", tnow));
-          sendHTTPRequest(format_request_payload("WATCH_SCREEN_RIGHT_EDGE", tnow));
-          tft->setRotation(WATCH_SCREEN_RIGHT_EDGE);
-          break;
-      case DIRECTION_LEFT_EDGE:
-          Serial.printf("WATCH_SCREEN_LEFT_EDGE\n");
-          tnow = ttgo_watch->rtc->getDateTime();
-          Serial.println(format_request_payload("WATCH_SCREEN_LEFT_EDGE", tnow));
-          sendHTTPRequest(format_request_payload("WATCH_SCREEN_LEFT_EDGE", tnow));
-          tft->setRotation(WATCH_SCREEN_LEFT_EDGE);
-          break;
-      default:
-          break;
-      }
-  }
-}
-
-void setup_lvgl(TTGOClass *ttgo_watch) {
-  ttgo_watch->openBL();
-  ttgo_watch->lvgl_begin();
-
-  lv_obj_t *label;
-
-  lv_obj_t *btn1 = lv_btn_create(lv_scr_act(), NULL);
-  lv_obj_set_event_cb(btn1, click_event_handler);
-  lv_obj_align(btn1, NULL, LV_ALIGN_CENTER, 0, -40);
-
-  label = lv_label_create(btn1, NULL);
-  lv_label_set_text(label, "Button");
-
-  lv_obj_t *btn2 = lv_btn_create(lv_scr_act(), NULL);
-  lv_obj_set_event_cb(btn2, click_event_handler);
-  lv_obj_align(btn2, NULL, LV_ALIGN_CENTER, 0, 40);
-  lv_btn_set_checkable(btn2, true);
-  lv_btn_toggle(btn2);
-  lv_btn_set_fit2(btn2, LV_FIT_NONE, LV_FIT_TIGHT);
-
-  label = lv_label_create(btn2, NULL);
-  lv_label_set_text(label, "Toggled");
-}
 
 void synchronize_time(TTGOClass *ttgo_watch) {
   //init and get the time
@@ -262,6 +132,35 @@ void setup() {
 
 void loop() {
     lv_task_handler();
-    sensor_event_handler();
+    sensor_event_handler(ttgo_watch);
     server.handleClient();
+    
+    // // Check if a client has connected
+    // WiFiClient client = server.available();
+    // if (client) {
+    //   Serial.println("New HTTP request");
+
+    //   // Read the request
+    //   String request = client.readStringUntil('\r');
+    //   client.flush();
+
+    //   // Print the request payload
+    //   Serial.println("Request Payload:");
+    //   while (client.available()) {
+    //     String line = client.readStringUntil('\r');
+    //     Serial.println(line);
+    //   }
+    //   // Send the response
+    //   client.println("HTTP/1.1 200 OK");
+    //   client.println("Content-type:text/html");
+    //   client.println();
+    //   client.println("<html><body><h1>HTTP Request Received</h1></body></html>");
+
+
+    //   // Close the connection
+    //   delay(1);
+    //   // client.stop();
+    //   // Serial.println("Client disconnected");
+    // }
+    // delay(5);
 }
