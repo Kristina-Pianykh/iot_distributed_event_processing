@@ -8,6 +8,7 @@ authors = ["Kristina Pianykh <kristinavrnrus@gmail.com>"]
 python = "^3.10"
 fastapi = "^0.96.0"
 uvicorn = {extras = ["standard"], version = "^0.22.0"}
+httpx = "^0.24.1"
 
 [tool.poetry.dev-dependencies]
 poethepoet = "^0.20.0"
