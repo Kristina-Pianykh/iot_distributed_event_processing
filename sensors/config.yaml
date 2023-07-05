@@ -1,0 +1,12 @@
+device_id: pi_3
+
+event:
+  joystick:
+    data_generation_interval: 0.1
+
+  accelerometer:
+    data_generation_interval: 0.4
+
+  humidity_temp_pressure:
+    data_generation_interval: 0.5
+  

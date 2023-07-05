@@ -1,0 +1,7 @@
+{
+  "system_id": "pi_6",
+  "sample_rate": "1",
+  "connection": [
+    "127.0.0.1:5005"
+  ]
+}
