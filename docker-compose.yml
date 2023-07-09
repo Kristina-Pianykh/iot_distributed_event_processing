@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  sensor-reader:
+    build:
+      context: .
+      dockerfile: ./sensors/Dockerfile
+    # volumes:
+    #   - ./sensor-reader:/app
+    # Add any additional configuration for the sensor-reader service
+  
+  fastapi-siddhi:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    ports:
+      - 8000:8000
+    # Add any additional configuration for the fastapi-siddhi service

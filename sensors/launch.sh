@@ -17,9 +17,9 @@ handle_sigint() {
 trap handle_sigint SIGINT
 
 # Launch your commands in the background
-python3 sensors/joystick.py & PIDS+=($!)
-python3 sensors/humidity_temp_pressure.py & PIDS+=($!)
-python3 sensors/accelerator.py & PIDS+=($!)
+python3 joystick.py & PIDS+=($!)
+python3 humidity_temp_pressure.py & PIDS+=($!)
+python3 accelerator.py & PIDS+=($!)
 # uvicorn server.http_server:app --reload --host 0.0.0.0 & PIDS+=($!)
 
 # Wait for all background commands to complete
