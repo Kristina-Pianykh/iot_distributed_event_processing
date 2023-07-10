@@ -1,66 +1,54 @@
-# # Stage 1: Building the dependencies
-# FROM python:3.10.12 AS builder
+FROM python:3.10
 
-# WORKDIR /app
+# Install jdk-8
+RUN mkdir -p /etc/apt/keyrings
+RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
+RUN echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+RUN apt update 
+RUN apt install -y temurin-8-jdk
 
-# # Copy the poetry.lock and pyproject.toml files
-# COPY ./poetry.lock ./pyproject.toml ./
+# Install old version of mavin to avoid http blocking - https://stackoverflow.com/questions/67001968/how-to-disable-maven-blocking-external-http-repositories
+# TODO: Checksum validation
+ARG MAVEN_VERSION=3.6.3
+ARG USER_HOME_DIR="/root"
+ARG DOWNLOAD_URL=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.tar.gz
+RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
+    && echo "Downlaoding maven" \
+    && curl -fsSL -o /tmp/apache-maven.tar.gz ${DOWNLOAD_URL} \
+    \
+    && echo "Unziping maven" \
+    && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
+    \
+    && echo "Cleaning and setting links" \
+    && rm -f /tmp/apache-maven.tar.gz \
+    && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+ENV MAVEN_HOME /usr/share/maven
+ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
+RUN mvn --version
 
-# # install Rust toolchain (needed to install poetry on raspberry pi)
-# RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y && \
-#     export PATH="$HOME/.cargo/bin:$PATH" && \
-#     rustc --version && \
-#     source "$HOME/.cargo/env"
+# Most of this is probably not needed, but I'm not sure which parts are needed
+RUN apt install -y libboost-python-dev build-essential g++ autotools-dev libicu-dev build-essential libbz2-dev libboost-all-dev
 
-# RUN pip install --upgrade pip && \
-#     pip install --upgrade setuptools && \
-#     pip install --upgrade wheel && \
-#     pip install poetry
-
-# # Install Poetry
-# # RUN pip -U pip setuptools && \
-# #     pip install --only-binary cryptography poetry && \
-# #     poetry export -f requirements.txt --without-hashes --no-interaction --no-ansi > requirements.txt
-
-# # RUN curl -sSL https://install.python-poetry.org | python3 -
-
-# # # Install project dependencies
-# RUN ~/.local/share/pypoetry/venv/bin/poetry config virtualenvs.create false && \
-#     ~/.local/share/pypoetry/venv/bin/poetry export -f requirements.txt --without-lshashes --no-interaction --no-ansi > requirements.txt
-
-# Stage 2: Running the shell script
-FROM python:3.7
+RUN git clone https://github.com/siddhi-io/PySiddhi.git \
+    && cd PySiddhi \
+    && pip install -r Requirements.txt \
+    && export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::") \
+    && export CPATH=$CPATH:$JAVA_HOME/include:$JAVA_HOME/include/linux:/usr/local/include/python3.10 \
+    && python setup.py install
 
 WORKDIR /app
-# COPY requirements.txt ./
-COPY server/ ./
 
-# Copy the installed dependencies from the previous stage
-# COPY --from=builder /app/requirements.txt /app/requirements.txt
+COPY test.py ./test.py
 
-# RUN pip install --upgrade pip && \
-#     # apt-get update && \
-#     # apt-get install -y default-jdk && \
-#     pip install -r requirements.txt
-
-RUN pip install --upgrade pip && \
-    apt-get update && \
-    pip install httpx fastapi uvicorn pyyaml cython wheel && \
-    apt-get install -y python3-dev libboost-python-dev build-essential g++ autotools-dev libicu-dev build-essential libbz2-dev libboost-all-dev maven default-jdk && \
-    wget https://github.com/siddhi-io/siddhi-sdk/releases/download/v5.1.2/siddhi-sdk-5.1.2.zip && \
-    unzip siddhi-sdk-5.1.2.zip && \
-    export SIDDHISDK_HOME=/app/siddhi-sdk-5.1.2 && \
-    pip install PySiddhi==5.1.0 && \
-    wget https://github.com/siddhi-io/PySiddhi/releases/download/v5.1.0/siddhi-python-api-proxy-5.1.0.jar && \
-    cp siddhi-python-api-proxy-5.1.0.jar $SIDDHISDK_HOME/lib && \
-    
-    # apt update
-    # apt install software-properties-common -y && \
-    # apt-add-repository 'deb http://security.debian.org/debian-security stretch/updates main' -y && \
-    # apt-get -y upgrade && \
-    # apt install -y openjdk-8-jdk && \
-    # pip install git+https://github.com/siddhi-io/PySiddhi.git
+RUN pip install pydantic
 
 
-# ENTRYPOINT uvicorn --host 0.0.0.0 api:app
-CMD python -m uvicorn http_server:app --reload --host 0.0.0.0 --port 8080
+RUN wget https://github.com/siddhi-io/siddhi-sdk/releases/download/v5.1.2/siddhi-sdk-5.1.2.zip
+RUN unzip siddhi-sdk-5.1.2.zip
+ENV SIDDHISDK_HOME=/app/siddhi-sdk-5.1.2
+RUN wget https://github.com/siddhi-io/PySiddhi/releases/download/v5.1.0/siddhi-python-api-proxy-5.1.0.jar
+RUN cp siddhi-python-api-proxy-5.1.0.jar $SIDDHISDK_HOME/lib
+
+ENV JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-armhf
+ENV JVM_PATH=/usr/lib/jvm/temurin-8-jdk-armhf/jre/lib/aarch32/client/libjvm.so
+CMD ["python", "test.py"]
