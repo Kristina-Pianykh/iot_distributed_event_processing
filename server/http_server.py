@@ -1,19 +1,23 @@
 import datetime
 import json
+import os
 from typing import Optional, Union
 from pydantic import BaseModel
-from threading import Thread
+# from threading import Thread
 import httpx
 
 from PySiddhi.DataTypes.LongType import LongType
 from PySiddhi.core.SiddhiManager import SiddhiManager
 from PySiddhi.core.query.output.callback.QueryCallback import QueryCallback
 from PySiddhi.core.util.EventPrinter import PrintEvent
-from siddhi_app import publish_event
 from fastapi import FastAPI, Request
 
 watch_url = "http://192.168.0.7/post"
 app = FastAPI()
+os.environ["SIDDHISDK_HOME"] = f"{os.getcwd()}/siddhi-sdk-5.1.0"
+# os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64/"
+# os.environ["JVM_HOME"] = "/usr/lib/jvm/java-11-openjdk-amd64"
+# os.environ["JAVA_PATH"] = "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjsig.so"
 siddhiManager = SiddhiManager()
 query_name = "test"
 
@@ -28,15 +32,16 @@ class Event(BaseModel):
 siddhiAppRuntime = None
 
 
-def start_siddhi_app():
-    # Siddhi Query to filter events with volume less than 150 as output
+@app.on_event("startup")
+def startup_event():
+    # Start the Siddhi app pn fastapi startup
     siddhiApp = f"""
-    define stream OutputDataStream (device_id string, sensor_id string, sensor_value float, timestamp int);
-    define stream outputStream (device_id string, sensor_id string, sensor_value float, timestamp long);
+    define stream cseEventStream (device_id string, sensor_id string, sensor_value float, timestamp int);
+    define stream outputStream (device_id string, sensor_id string, sensor_value float, timestamp int);
 
-    @info(name = {query_name})
-    from every e1 = cseEventStream[sensor_id == 'joystick' and sensor_value == 'left'] ->
-                 e2 = cseEventStream[sensor_id == 'joystick' and sensor_value == 'right' and timestamp - e1.timestamp <= 5000]
+    @info(name = '{query_name}')
+    from every e1 = cseEventStream[sensor_id == 'joystick' and sensor_value == 1.0] ->
+                 e2 = cseEventStream[sensor_id == 'joystick' and sensor_value == -1.0 and timestamp - e1.timestamp <= 5000]
     select e1.device_id, e1.sensor_id, e1.sensor_value, e1.timestamp
     insert into outputStream;
     """
@@ -53,13 +58,6 @@ def start_siddhi_app():
 
     # Starting event processing
     siddhiAppRuntime.start()
-
-
-@app.on_event("startup")
-def startup_event():
-    # Start the Siddhi app in a separate thread
-    siddhi_thread = Thread(target=start_siddhi_app)
-    siddhi_thread.start()
 
 
 @app.post("/")

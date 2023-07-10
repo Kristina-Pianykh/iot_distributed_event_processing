@@ -6,7 +6,7 @@ import yaml
 
 
 # Open the YAML file and load its content
-with open("sensors/config.yaml", "r") as file:
+with open("config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 sensors = {"humidity": 0, "temp": 0, "pressure": 0}

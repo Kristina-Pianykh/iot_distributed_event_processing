@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Built-By: mohan
+Class-Path: lib/siddhi-core-5.1.7.jar lib/siddhi-query-api-5.1.7.jar l
+ ib/siddhi-query-compiler-5.1.7.jar lib/mvel2-2.4.4.Final.jar lib/antl
+ r4-runtime-4.7.2.jar lib/siddhi-annotations-5.1.7.jar lib/classindex-
+ 3.8.jar lib/log4j-1.2.17.jar lib/slf4j-simple-1.7.12.jar lib/slf4j-ap
+ i-1.7.12.jar lib/disruptor-3.4.2.wso2v1.jar lib/guava-23.0.jar lib/js
+ r305-1.3.9.jar lib/error_prone_annotations-2.0.18.jar lib/j2objc-anno
+ tations-1.1.jar lib/animal-sniffer-annotations-1.14.jar lib/quartz-2.
+ 1.1.wso2v1.jar lib/quartz-2.1.1.jar lib/c3p0-0.9.1.1.jar lib/metrics-
+ core-3.1.0.jar lib/gson-2.8.5.jar lib/json-path-2.4.0.jar lib/json-sm
+ art-2.3.jar lib/accessors-smart-1.2.jar lib/asm-5.0.4.jar lib/org.ecl
+ ipse.osgi.services-3.3.100.v20130513-1956.jar lib/org.osgi.core-6.0.0
+ .jar lib/snakeyaml-1.25.jar
+Created-By: Apache Maven 3.5.3
+Build-Jdk: 1.8.0_212
+

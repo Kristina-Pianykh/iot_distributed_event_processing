@@ -6,7 +6,7 @@ import httpx
 
 
 # Open the YAML file and load its content
-with open("sensors/config.yaml", "r") as file:
+with open("config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 device_id = config["device_id"]

@@ -13,5 +13,5 @@ services:
       context: .
       dockerfile: ./server/Dockerfile
     ports:
-      - 8000:8000
+      - 8080:8000
     # Add any additional configuration for the fastapi-siddhi service

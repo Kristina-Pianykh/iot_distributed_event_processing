@@ -35,7 +35,7 @@ pyenv install 3.10.12
 curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
 source "$HOME/.cargo/env"
 rustc --version
-rustup update
+# rustup update
 
 # install poetry
 pip3 install poetry
