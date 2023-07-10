@@ -15,4 +15,5 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 systemctl start docker # you will be prompted for the password
 
 
-git clone https://github.com/RPi-Distro/RTIMULib.git
+# git clone https://github.com/RPi-Distro/RTIMULib.git
+export SIDDHISDK_HOME="$PWD/siddhi-sdk-5.1.2/"
