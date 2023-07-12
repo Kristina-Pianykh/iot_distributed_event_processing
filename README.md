@@ -19,14 +19,24 @@ poetry run poe start
 4. Open the `./arduino/watch_event_processing` in Arduino IDE
 5. Upload the sketch to the watch
 
-## Events used:
+## Watch Events:
 
 1. Click event
 2. Toggle event (combined with `1`)
 3. Rotation events (2-dimensional)
 
-## Events to consider?:
+## Run on a Pi
 
-1. Accelerometer (measure acceleration forces, typically in three axes: X, Y, and Z). Flodd of events
-2. Step counting? (based on accelerometer metrics)
-3.
+1. Install `Docker` and `docker compose` by running
+
+```bash
+./install_docker.sh
+```
+
+2. Start the services with
+
+```bash
+sudo docker compose up
+```
+It spins up two services: (a) the fastapi http server with the event processing app Siddhi and (b) the service to reads sensor data from the pi and send it to the http server
+
