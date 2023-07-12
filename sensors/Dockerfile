@@ -18,13 +18,10 @@ FROM python:3.10.12
 
 WORKDIR /app
 
-# Copy the shell script
-COPY requirements.txt ./
-COPY sensors/ ./
-
 # Copy the installed dependencies from the previous stage
 # COPY --from=builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 # Install dependencies including sense-hat
+RUN pip install httpx pyyaml
 RUN apt update && \
     apt upgrade -y && \
     apt install -y python3-dev libopenjp2-7 && \
@@ -34,6 +31,8 @@ RUN apt update && \
     python setup.py install && \
     pip install sense-hat && \
     cd /app
+
+COPY sensors/ ./
 
 # Run the shell script
 ENTRYPOINT bash /app/launch.sh

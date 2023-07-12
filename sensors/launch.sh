@@ -16,6 +16,9 @@ handle_sigint() {
 # Register the SIGINT handler function
 trap handle_sigint SIGINT
 
+# sleep to allow the server to start first
+sleep 15
+
 # Launch your commands in the background
 python3 joystick.py & PIDS+=($!)
 python3 humidity_temp_pressure.py & PIDS+=($!)

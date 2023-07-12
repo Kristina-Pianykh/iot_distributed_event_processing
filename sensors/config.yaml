@@ -1,5 +1,5 @@
 device_id: pi_3
-post_url: "http://localhost:8000"
+post_url: "http://fastapi-siddhi:8000"
 
 event:
   joystick:

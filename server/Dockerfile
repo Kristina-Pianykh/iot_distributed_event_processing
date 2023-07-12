@@ -38,9 +38,9 @@ RUN git clone https://github.com/siddhi-io/PySiddhi.git \
 
 WORKDIR /app
 
-COPY test.py ./test.py
+# COPY test.py ./test.py
 
-RUN pip install pydantic
+RUN pip install pydantic fastapi uvicorn httpx pyyaml
 
 
 RUN wget https://github.com/siddhi-io/siddhi-sdk/releases/download/v5.1.2/siddhi-sdk-5.1.2.zip
@@ -51,4 +51,7 @@ RUN cp siddhi-python-api-proxy-5.1.0.jar $SIDDHISDK_HOME/lib
 
 ENV JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-armhf
 ENV JVM_PATH=/usr/lib/jvm/temurin-8-jdk-armhf/jre/lib/aarch32/client/libjvm.so
-CMD ["python", "test.py"]
+# CMD ["python", "test.py"]
+COPY server/ .
+
+CMD python -m uvicorn http_server:app --reload --host 0.0.0.0 --port 8000

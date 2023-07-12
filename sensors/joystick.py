@@ -26,9 +26,17 @@ while True:
     for event in sense.stick.get_events():
         # Check if the joystick was pressed
         if event.action == "pressed":
-            sensor_value = (
-                event.direction
-            )  # funktioniert nicht solange parser auf double value eingestellt ist
+            if event.direction == "up":
+                sensor_value = 1.0
+            elif event.direction == "down":
+                sensor_value = -1.0
+            elif event.direction == "left":
+                sensor_value = -0.1
+            elif event.direction == "right":
+                sensor_value = 0.1
+            # sensor_value = (
+            #     event.direction
+            # )  # funktioniert nicht solange parser auf double value eingestellt ist
 
             message = (
                 f"{device_id} | {sensor_name} | {sensor_value} | {int(time.time())}"

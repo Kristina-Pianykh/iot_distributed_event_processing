@@ -28,6 +28,15 @@ class Event(BaseModel):
     sensor_value: Union[float, str]
     timestamp: int
 
+    @classmethod
+    def from_string(cls, event_str: str) -> 'Event':
+        values = event_str.split(" | ")
+        device_id = values[0]
+        sensor_id = values[1]
+        sensor_value = float(values[2])
+        timestamp = int(values[3])
+        return cls(device_id=device_id, sensor_id=sensor_id, sensor_value=sensor_value, timestamp=timestamp)
+
 
 siddhiAppRuntime = None
 
@@ -63,7 +72,8 @@ def startup_event():
 @app.post("/")
 async def recieve_event(request: Request):
     body = await request.body()  # Read the request body
-    event = Event.parse_raw(body)  # Parse the request body as JSON
+    message = json.loads(body)["Data"]
+    event = Event.from_string(message)  # Parse the request body as JSON
     # event = json.loads(body.decode())
     # event_timestamp = decoded_message.get("Time", "No time provided")
     # decoded_message["Time"] = datetime.datetime.fromtimestamp(event_timestamp)
