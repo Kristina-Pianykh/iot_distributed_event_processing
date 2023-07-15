@@ -1,7 +1,6 @@
 from sense_hat import SenseHat
 import time
-import httpx
-import json
+from utils import send_event
 import yaml
 
 
@@ -16,11 +15,6 @@ interval = float(config["event"]["accelerometer"]["data_generation_interval"])
 sensor_name = "accelerometer"
 url = config["post_url"]
 
-# Set the headers
-headers = {
-    "Content-Type": "application/json",
-}
-
 # setup sensehat
 sense = SenseHat()
 
@@ -31,6 +25,7 @@ while True:
         if val != sensors[key]:
             message = f"{device_id} | accelerometer_{key} | {val} | {int(time.time())}"
             print(message)
-            httpx.post(url, headers=headers, data=json.dumps({"Data": message}))
+            send_event(url, message)
+            # httpx.post(url, headers=headers, data=json.dumps({"Data": message}))
             sensors[key] = val
         time.sleep(interval)

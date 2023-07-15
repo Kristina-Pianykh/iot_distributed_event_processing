@@ -17,12 +17,13 @@ handle_sigint() {
 trap handle_sigint SIGINT
 
 # sleep to allow the server to start first
-sleep 15
+# sleep 15
 
 # Launch your commands in the background
 python3 joystick.py & PIDS+=($!)
 python3 humidity_temp_pressure.py & PIDS+=($!)
 python3 accelerator.py & PIDS+=($!)
+python3 sound.py & PIDS+=($!)
 # uvicorn server.http_server:app --reload --host 0.0.0.0 & PIDS+=($!)
 
 # Wait for all background commands to complete
