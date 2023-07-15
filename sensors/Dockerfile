@@ -21,7 +21,6 @@ WORKDIR /app
 # Copy the installed dependencies from the previous stage
 # COPY --from=builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 # Install dependencies including sense-hat
-RUN pip install httpx pyyaml
 RUN apt update && \
     apt upgrade -y && \
     apt install -y python3-dev libopenjp2-7 && \
@@ -31,6 +30,9 @@ RUN apt update && \
     python setup.py install && \
     pip install sense-hat && \
     cd /app
+
+# Install project dependencies
+RUN pip install httpx pyyaml RPi.GPIO
 
 COPY sensors/ ./
 
