@@ -1,5 +1,12 @@
-device_id: pi_3
-post_url: "http://fastapi-siddhi:8000"
+device_id:
+  pi_3: 
+  - joystick
+  - accelerometer
+  - humidity_temp_pressure
+  pi_1:
+    - sound
+
+post_url: http://fastapi-siddhi:8000
 
 event:
   joystick:
@@ -10,4 +17,7 @@ event:
 
   humidity_temp_pressure:
     data_generation_interval: 0.5
+  
+  sound:
+    data_generation_interval: 0.0
   
