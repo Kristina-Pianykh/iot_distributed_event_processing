@@ -1,15 +1,19 @@
 from sense_hat import SenseHat
 import time
 import yaml
-from utils import send_event
+from utils import send_event, read_config
 
-# Open the YAML file and load its content
-with open("config.yaml", "r") as file:
-    config = yaml.safe_load(file)
+
+config = read_config()
+
+SENSOR = "humidity_temp_pressure"
+DEVICE_ID = [
+    device for device in config["device_id"] if SENSOR in config["device_id"][device]
+][0]
 
 sensors = {"humidity": 0, "temp": 0, "pressure": 0}
-device_id = config["device_id"]
-interval = float(config["event"]["humidity_temp_pressure"]["data_generation_interval"])
+# device_id = config["device_id"]
+interval = float(config["event"][SENSOR]["data_generation_interval"])
 url = config["post_url"]
 
 # setup sensehat
@@ -19,8 +23,8 @@ while True:
     fresh = {"humidity": sense.humidity, "temp": sense.temp, "pressure": sense.pressure}
     for key, val in fresh.items():
         if val != sensors[key]:
-            message = f"{device_id} | {key} | {val} | {int(time.time())}"
-            print(message)
-            send_event(url, message)
+            # message = f"{DEVICE_ID} | {key} | {val} | {int(time.time())}"
+            # print(message)
+            send_event(url=url, device_id=DEVICE_ID, sensor=key, sensor_val=val)
             sensors[key] = val
         time.sleep(interval)

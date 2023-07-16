@@ -1,16 +1,20 @@
 import RPi.GPIO as GPIO
-from utils import send_event
+from utils import send_event, read_config
 import yaml
 import time
 
 
-# Open the YAML file and load its content
-with open("config.yaml", "r") as file:
-    config = yaml.safe_load(file)
+config = read_config()
+
+SENSOR = "sound"
+DEVICE_ID = [
+    device for device in config["device_id"] if SENSOR in config["device_id"][device]
+][0]
+
 
 sensors = {"sound": 0}
-device_id = config["device_id"]
-interval = float(config["event"]["sound"]["data_generation_interval"])
+# device_id = config["device_id"]
+interval = float(config["event"][SENSOR]["data_generation_interval"])
 url = config["post_url"]
 
 # Define the GPIO pin number for the sound sensor
@@ -24,8 +28,8 @@ GPIO.setup(SOUND_SENSOR_PIN, GPIO.IN)
 while True:
     if GPIO.input(SOUND_SENSOR_PIN):
         print("Sound detected!")
-        send_event()
+        # message = f"{DEVICE_ID} | {SENSOR} | 1 | {int(time.time())}"
+        send_event(url=url, device_id=DEVICE_ID, sensor=SENSOR, sensor_val=1.0)
     # else:
     #     print("No sound detected!")
     time.sleep(interval)
-

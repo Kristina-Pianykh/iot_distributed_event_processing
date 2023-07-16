@@ -1,16 +1,19 @@
 from sense_hat import SenseHat
 import yaml
 import time
-from utils import send_event
+from utils import send_event, read_config
 
 
-# Open the YAML file and load its content
-with open("config.yaml", "r") as file:
-    config = yaml.safe_load(file)
+config = read_config()
 
-device_id = config["device_id"]
+SENSOR = "joystick"
+DEVICE_ID = [
+    device for device in config["device_id"] if SENSOR in config["device_id"][device]
+][0]
+
+# device_id = config["device_id"]
 interval = float(config["event"]["joystick"]["data_generation_interval"])
-sensor_name = "joystick"
+# sensor_name = "joystick"
 url = config["post_url"]
 
 
@@ -33,10 +36,12 @@ while True:
             #     event.direction
             # )  # funktioniert nicht solange parser auf double value eingestellt ist
 
-            message = (
-                f"{device_id} | {sensor_name} | {sensor_value} | {int(time.time())}"
+            # message = (
+            #     f"{device_id} | {sensor_name} | {sensor_value} | {int(time.time())}"
+            # )
+            # print(message)
+            send_event(
+                url=url, device_id=DEVICE_ID, sensor=SENSOR, sensor_val=sensor_value
             )
-            print(message)
-            send_event(url, message)
             # httpx.post(url, headers=headers, data=json.dumps({"Data": message}))
         time.sleep(interval)
