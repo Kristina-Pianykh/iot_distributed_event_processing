@@ -36,7 +36,10 @@ poetry run poe start
 2. Start the services with
 
 ```bash
-sudo docker compose up
+sudo DEVICE_ID=<pi_id> docker compose up
 ```
+
+where `pi_id` is the ID of the current rasberry pi.
+
 It spins up two services: (a) the fastapi http server with the event processing app Siddhi and (b) the service to reads sensor data from the pi and send it to the http server
 
