@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   sensor-reader:
+    platform: linux/arm/v7
     privileged: true
     build:
       context: .
@@ -14,6 +15,8 @@ services:
     # Add any additional configuration for the sensor-reader service
   
   fastapi-siddhi:
+    platform: linux/arm/v7
+    privileged: true
     build:
       context: .
       dockerfile: ./server/Dockerfile
