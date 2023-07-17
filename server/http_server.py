@@ -1,12 +1,13 @@
 import datetime
 import json
 import os
-from typing import Optional, Union
+from typing import Union
 from pydantic import BaseModel
+
 # from threading import Thread
 import httpx
+from rainbow_leds import flash_rainbow
 
-from PySiddhi.DataTypes.LongType import LongType
 from PySiddhi.core.SiddhiManager import SiddhiManager
 from PySiddhi.core.query.output.callback.QueryCallback import QueryCallback
 from PySiddhi.core.util.EventPrinter import PrintEvent
@@ -29,13 +30,18 @@ class Event(BaseModel):
     timestamp: int
 
     @classmethod
-    def from_string(cls, event_str: str) -> 'Event':
+    def from_string(cls, event_str: str) -> "Event":
         values = event_str.split(" | ")
         device_id = values[0]
         sensor_id = values[1]
         sensor_value = float(values[2])
         timestamp = int(values[3])
-        return cls(device_id=device_id, sensor_id=sensor_id, sensor_value=sensor_value, timestamp=timestamp)
+        return cls(
+            device_id=device_id,
+            sensor_id=sensor_id,
+            sensor_value=sensor_value,
+            timestamp=timestamp,
+        )
 
 
 siddhiAppRuntime = None
@@ -62,6 +68,7 @@ def startup_event():
     class QueryCallbackImpl(QueryCallback):
         def receive(self, timestamp, inEvents, outEvents):
             PrintEvent(timestamp, inEvents, outEvents)
+            flash_rainbow() # Flash the rainbow LEDs on the watch
 
     siddhiAppRuntime.addCallback(query_name, QueryCallbackImpl())
 

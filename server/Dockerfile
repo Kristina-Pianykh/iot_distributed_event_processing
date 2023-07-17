@@ -51,7 +51,19 @@ RUN cp siddhi-python-api-proxy-5.1.0.jar $SIDDHISDK_HOME/lib
 
 ENV JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-armhf
 ENV JVM_PATH=/usr/lib/jvm/temurin-8-jdk-armhf/jre/lib/aarch32/client/libjvm.so
+
+# Install dependencies including sense-hat
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y python3-dev libopenjp2-7 && \
+    git clone https://github.com/RPi-Distro/RTIMULib.git && \
+    cd RTIMULib/Linux/python && \
+    python setup.py build && \
+    python setup.py install && \
+    pip install sense-hat && \
+    cd /app
 # CMD ["python", "test.py"]
 COPY server/ .
+COPY config.yaml ./
 
 CMD python -m uvicorn http_server:app --reload --host 0.0.0.0 --port 8000
