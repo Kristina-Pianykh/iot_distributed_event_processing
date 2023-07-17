@@ -35,6 +35,7 @@ RUN apt update && \
 RUN pip install httpx pyyaml RPi.GPIO
 
 COPY sensors/ ./
+COPY config.yaml ./
 
 # Run the shell script
 ENTRYPOINT bash /app/launch.sh ${DEVICE_ID}

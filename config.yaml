@@ -1,13 +1,20 @@
-device_id:
-  pi_3: 
-  - joystick
-  - accelerometer
-  - humidity_temp_pressure
+# Devices config
+device:
   pi_1:
-    - sound
+    ip: xxxx
+    sensors:
+      - sound
+  pi_3:
+    ip: xxxx
+    sensors:
+      - joystick
+      - accelerometer
+      - humidity_temp_pressure
+
 
 post_url: http://fastapi-siddhi:8000
 
+# Event config
 event:
   joystick:
     data_generation_interval: 0.1

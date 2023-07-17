@@ -8,7 +8,9 @@ config = read_config()
 
 SENSOR = "humidity_temp_pressure"
 DEVICE_ID = [
-    device for device in config["device_id"] if SENSOR in config["device_id"][device]
+    device_id
+    for device_id, device_info in config["device"].items()
+    if SENSOR in device_info.get("sensors", [])
 ][0]
 
 sensors = {"humidity": 0, "temp": 0, "pressure": 0}

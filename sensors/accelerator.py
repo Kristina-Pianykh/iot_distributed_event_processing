@@ -7,7 +7,9 @@ config = read_config()
 
 SENSOR = "accelerometer"
 DEVICE_ID = [
-    device for device in config["device_id"] if SENSOR in config["device_id"][device]
+    device_id
+    for device_id, device_info in config["device"].items()
+    if SENSOR in device_info.get("sensors", [])
 ][0]
 
 sensors = {"x": 0, "y": 0, "z": 0}
