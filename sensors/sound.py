@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from utils import send_event, read_config
+from utils import send_event, read_config, set_constants
 import yaml
 import time
 
@@ -7,17 +7,10 @@ import time
 config = read_config()
 
 SENSOR = "sound"
-DEVICE_ID = [
-    device_id
-    for device_id, device_info in config["device"].items()
-    if SENSOR in device_info.get("sensors", [])
-][0]
-
-
 sensors = {"sound": 0}
 # device_id = config["device_id"]
 interval = float(config["event"][SENSOR]["data_generation_interval"])
-url = config["post_url"]
+constants = set_constants()
 
 # Define the GPIO pin number for the sound sensor
 SOUND_SENSOR_PIN = 17
@@ -31,7 +24,12 @@ while True:
     if GPIO.input(SOUND_SENSOR_PIN):
         print("Sound detected!")
         # message = f"{DEVICE_ID} | {SENSOR} | 1 | {int(time.time())}"
-        send_event(url=url, device_id=DEVICE_ID, sensor=SENSOR, sensor_val=1.0)
+        send_event(
+            urls=constants["urls"],
+            device_id=constants["device_id"],
+            sensor=SENSOR,
+            sensor_val=1.0,
+        )
     # else:
     #     print("No sound detected!")
     time.sleep(interval)

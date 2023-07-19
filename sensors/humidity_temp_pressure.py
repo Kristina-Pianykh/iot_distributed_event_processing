@@ -1,25 +1,19 @@
-from sense_hat import SenseHat
 import time
 import yaml
-from utils import send_event, read_config
+from utils import send_event, set_constants, read_config
+from sensehat import sense
 
 
 config = read_config()
 
 SENSOR = "humidity_temp_pressure"
-DEVICE_ID = [
-    device_id
-    for device_id, device_info in config["device"].items()
-    if SENSOR in device_info.get("sensors", [])
-][0]
-
 sensors = {"humidity": 0, "temp": 0, "pressure": 0}
 # device_id = config["device_id"]
 interval = float(config["event"][SENSOR]["data_generation_interval"])
-url = config["post_url"]
+constants = set_constants()
 
-# setup sensehat
-sense = SenseHat()
+# # setup sensehat
+# sense = SenseHat()
 
 while True:
     fresh = {"humidity": sense.humidity, "temp": sense.temp, "pressure": sense.pressure}
@@ -27,6 +21,11 @@ while True:
         if val != sensors[key]:
             # message = f"{DEVICE_ID} | {key} | {val} | {int(time.time())}"
             # print(message)
-            send_event(url=url, device_id=DEVICE_ID, sensor=key, sensor_val=val)
+            send_event(
+                urls=constants["urls"],
+                device_id=constants["device_id"],
+                sensor=key,
+                sensor_val=val,
+            )
             sensors[key] = val
         time.sleep(interval)

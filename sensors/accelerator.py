@@ -1,24 +1,19 @@
-from sense_hat import SenseHat
 import time
-from utils import send_event, read_config
+from utils import send_event, read_config, set_constants
+from sensehat import sense
 import yaml
 
 config = read_config()
 
 SENSOR = "accelerometer"
-DEVICE_ID = [
-    device_id
-    for device_id, device_info in config["device"].items()
-    if SENSOR in device_info.get("sensors", [])
-][0]
 
 sensors = {"x": 0, "y": 0, "z": 0}
 # device_id = config["device_id"]
 interval = float(config["event"][SENSOR]["data_generation_interval"])
-url = config["post_url"]
+constants = set_constants()
 
-# setup sensehat
-sense = SenseHat()
+# # setup sensehat
+# sense = SenseHat()
 
 while True:
     acceleration = sense.get_accelerometer_raw()
@@ -28,8 +23,8 @@ while True:
             # message = f"{DEVICE_ID} | accelerometer_{key} | {val} | {int(time.time())}"
             # print(message)
             send_event(
-                url=url,
-                device_id=DEVICE_ID,
+                urls=constants["urls"],
+                device_id=constants["device_id"],
                 sensor=f"accelerometer_{key}",
                 sensor_val=val,
             )

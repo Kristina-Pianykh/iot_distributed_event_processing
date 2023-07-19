@@ -53,8 +53,7 @@ ENV JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-armhf
 ENV JVM_PATH=/usr/lib/jvm/temurin-8-jdk-armhf/jre/lib/aarch32/client/libjvm.so
 
 # Install dependencies including sense-hat
-RUN apt update && \
-    apt upgrade -y && \
+RUN apt upgrade -y && \
     apt install -y python3-dev libopenjp2-7 && \
     git clone https://github.com/RPi-Distro/RTIMULib.git && \
     cd RTIMULib/Linux/python && \

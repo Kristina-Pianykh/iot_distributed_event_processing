@@ -37,6 +37,8 @@ RUN pip install httpx pyyaml RPi.GPIO
 COPY sensors/ ./
 COPY config.yaml ./
 
+ENV DEVICE_ID=${DEVICE_ID}
+
 # Run the shell script
 ENTRYPOINT bash /app/launch.sh ${DEVICE_ID}
 # CMD ["bash", "/app/launch.sh"]

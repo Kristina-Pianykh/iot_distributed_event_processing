@@ -1,15 +1,15 @@
 # Devices config
 device:
-  pi_1:
-    ip: xxxx
-    sensors:
-      - sound
   pi_3:
-    ip: xxxx
+    ip: "192.168.178.25"
     sensors:
       - joystick
       - accelerometer
       - humidity_temp_pressure
+  pi_4:
+    ip: "192.168.178.29"
+    sensors:
+      - sound
 
 
 post_url: http://fastapi-siddhi:8000

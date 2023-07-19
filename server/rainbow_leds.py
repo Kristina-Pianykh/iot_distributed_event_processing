@@ -3,12 +3,12 @@ import time
 import httpx
 import yaml
 
-
 with open("config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 ip = config["device"]["pi_3"]["ip"]
-url = f"http://{ip}/post"
+url = f"http://{ip}:8000/match"
+
 
 def flash_rainbow() -> None:
     """
@@ -19,17 +19,17 @@ def flash_rainbow() -> None:
         sense = SenseHat()
     except OSError:
         print("No Sense HAT detected, sending to another device")
-        httpx.post(url)
+        httpx.post(url, data={})
 
     # Define RGB values for rainbow colors
     colors = [
-        (255, 0, 0),     # Red
-        (255, 165, 0),   # Orange
-        (255, 255, 0),   # Yellow
-        (0, 255, 0),     # Green
-        (0, 0, 255),     # Blue
-        (75, 0, 130),    # Indigo
-        (238, 130, 238)  # Violet
+        (255, 0, 0),  # Red
+        (255, 165, 0),  # Orange
+        (255, 255, 0),  # Yellow
+        (0, 255, 0),  # Green
+        (0, 0, 255),  # Blue
+        (75, 0, 130),  # Indigo
+        (238, 130, 238),  # Violet
     ]
 
     # Define the duration (in seconds) for each color
@@ -40,10 +40,10 @@ def flash_rainbow() -> None:
         for color in colors:
             # Set all the LEDs to the current color
             sense.clear(color)
-            
+
             # Wait for the specified duration
             time.sleep(duration)
-            
+
             # Clear the LEDs
             sense.clear()
 

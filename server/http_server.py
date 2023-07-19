@@ -68,7 +68,7 @@ def startup_event():
     class QueryCallbackImpl(QueryCallback):
         def receive(self, timestamp, inEvents, outEvents):
             PrintEvent(timestamp, inEvents, outEvents)
-            flash_rainbow() # Flash the rainbow LEDs on the watch
+            flash_rainbow()  # Flash the rainbow LEDs on the watch
 
     siddhiAppRuntime.addCallback(query_name, QueryCallbackImpl())
 
@@ -104,3 +104,14 @@ async def recieve_event(request: Request):
 
     # return await request.json()
     # return decoded_message
+
+
+@app.post("/match")
+async def flash_lights(request: Request):
+    flash_rainbow()
+
+
+@app.get("/health")
+async def check_health(request: Request):
+    """check if the server is healthy"""
+    return {"status": "healthy"}

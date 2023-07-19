@@ -26,6 +26,12 @@ handle_sigint() {
 # Register the SIGINT handler function
 trap handle_sigint SIGINT
 
+# Remove the old configuration
+rm -rf .config/sense_hat
+
+# Check if all pi servers are healthy
+python3 check_server_health.py
+
 if [ "$DEVICE_ID" == "pi_3" ]; then
     # Launch in the background
     python3 joystick.py & PIDS+=($!)
@@ -33,15 +39,8 @@ if [ "$DEVICE_ID" == "pi_3" ]; then
     python3 accelerator.py & PIDS+=($!)
 else
     # Launch in the background
-    python3 sound.py & PIDS+=($!)
+    python3 sound_stub.py & PIDS+=($!)
 fi
-
-# Launch your commands in the background
-# python3 joystick.py & PIDS+=($!)
-# python3 humidity_temp_pressure.py & PIDS+=($!)
-# python3 accelerator.py & PIDS+=($!)
-# python3 sound.py & PIDS+=($!)
-# uvicorn server.http_server:app --reload --host 0.0.0.0 & PIDS+=($!)
 
 # Wait for all background commands to complete
 wait
