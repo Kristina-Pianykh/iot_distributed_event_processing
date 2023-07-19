@@ -1,13 +1,15 @@
 # Devices config
 device:
   pi_3:
-    ip: "192.168.178.25"
+    # ip: "192.168.178.25" # home
+    ip: "192.168.1.143" # uni
     sensors:
       - joystick
       - accelerometer
       - humidity_temp_pressure
   pi_4:
-    ip: "192.168.178.29"
+    # ip: "192.168.178.29" # home
+    ip: "192.168.1.144" # uni
     sensors:
       - sound
 
@@ -28,3 +30,9 @@ event:
   sound:
     data_generation_interval: 0.0
   
+
+  # timestamp in seconds: only hour, minutes, seconds
+
+  # connect to the pis from the laptop:
+   # pi3: sshpass -p 45687231 ssh -o StrictHostKeyChecking=no pi@192.168.1.143
+   # pi4: sshpass -p 35468432 ssh -o StrictHostKeyChecking=no pi@192.168.1.144
