@@ -65,7 +65,7 @@ RUN apt upgrade -y && \
     pip install sense-hat && \
     cd /app
 # CMD ["python", "test.py"]
-COPY server/ .
-COPY config.yaml ./
-
-CMD python -m uvicorn http_server:app --reload --host 0.0.0.0 --port 8000
+# COPY server/ .
+# COPY config.yaml ./
+#
+# CMD python -m uvicorn http_server:app --reload --host 0.0.0.0 --port 8000

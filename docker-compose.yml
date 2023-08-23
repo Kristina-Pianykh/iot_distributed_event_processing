@@ -21,6 +21,9 @@ services:
     build:
       context: .
       dockerfile: ./server/Dockerfile
+    volumes:
+      - ./:/app
+    command: cd /app/server && python -m uvicorn http_server:app --reload --host 0.0.0.0 --port 8000
     platform: linux/arm/v7
     ports:
       - 8000:8000
