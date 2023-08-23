@@ -2,8 +2,9 @@ from typing import Any
 import httpx
 import os
 import json
-import time
 import yaml
+import datetime
+
 
 # Set the headers
 headers = {
@@ -11,14 +12,19 @@ headers = {
 }
 
 
+def get_time_in_sec() -> int:
+    current_time = datetime.datetime.now()
+    return current_time.minute * 60 + current_time.second
+
+
 def send_event(urls: list[str], device_id: str, sensor: str, sensor_val: float) -> None:
     """Send an event to the http server
     and retry if it fails"""
-    message = f"{device_id} | {sensor} | {sensor_val} | {int(time.time())}"
+    message = f"pi | {device_id} | {sensor} | {sensor_val} | {get_time_in_sec()}"
     # print(message)
     for url in urls:
         try:
-            httpx.post(url, headers=headers, data=json.dumps({"Data": message}))
+            httpx.post(url, headers=headers, data=json.dumps(message))
         except Exception as e:
             print(f"Failed to send event: {message} to {url} with exception: {e}")
 
