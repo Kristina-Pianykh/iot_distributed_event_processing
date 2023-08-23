@@ -15,7 +15,7 @@ from fastapi import FastAPI, Request
 
 watch_url = "http://192.168.0.7/post"
 app = FastAPI()
-os.environ["SIDDHISDK_HOME"] = f"{os.getcwd()}/siddhi-sdk-5.1.0"
+os.environ["SIDDHISDK_HOME"] = f"{os.getcwd()}/../siddhi-sdk-5.1.2"
 # os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64/"
 # os.environ["JVM_HOME"] = "/usr/lib/jvm/java-11-openjdk-amd64"
 # os.environ["JAVA_PATH"] = "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjsig.so"
