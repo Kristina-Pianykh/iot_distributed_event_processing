@@ -2,11 +2,11 @@ from sense_hat import SenseHat
 import time
 import httpx
 import yaml
+from parse import read_config
 
-with open("../config.yaml", "r") as file:
-    config = yaml.safe_load(file)
 
-ip = config["device"]["pi_3"]["ip"]
+config = read_config()
+ip = config["pis"]["pi_3"]["ip"]
 url = f"http://{ip}:8000/match"
 
 
