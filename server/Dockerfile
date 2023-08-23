@@ -31,6 +31,8 @@ RUN apt install -y libboost-python-dev build-essential g++ autotools-dev libicu-
 
 RUN git clone https://github.com/siddhi-io/PySiddhi.git \
     && cd PySiddhi \
+    && echo "Cython<3" >> constraints.txt \
+    && export PIP_CONSTRAINT=constraints.txt \
     && pip install -r Requirements.txt \
     && export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::") \
     && export CPATH=$CPATH:$JAVA_HOME/include:$JAVA_HOME/include/linux:/usr/local/include/python3.10 \
