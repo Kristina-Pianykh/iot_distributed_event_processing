@@ -45,7 +45,7 @@ def flash_rainbow() -> None:
 
             # Display a blank matrix at the end
             sense.clear()
-            time.sleep(0.5)
-    except OSError:
+            time.sleep(0.2)
+    except:
         print("No Sense HAT detected, sending to another device")
         httpx.get(url)
