@@ -1,20 +1,13 @@
-import yaml
 import time
 from utils import send_event, set_constants
-from sensehat import sense
+from sensehat import get_sense_hat
 
 
 # config = read_config()
-
+sense = get_sense_hat()
 SENSOR = "joystick"
-
-# device_id = config["device_id"]
-# interval = float(config["event"]["joystick"]["data_generation_interval"])
 constants = set_constants(SENSOR)
 
-
-# # setup sensehat
-# sense = SenseHat()
 
 while True:
     for event in sense.stick.get_events():

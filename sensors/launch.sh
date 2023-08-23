@@ -32,6 +32,8 @@ rm -rf .config/sense_hat
 # Check if all pi servers are healthy
 python3 check_server_health.py
 
+python3 sense_hat.py # do i need that here?
+
 if [ "$DEVICE_ID" == "pi_3" ]; then
     # Launch in the background
     python3 joystick.py & PIDS+=($!)

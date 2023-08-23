@@ -1,8 +1,8 @@
 import time
 from utils import send_event, set_constants
-from sensehat import sense
-import yaml
+from sensehat import get_sense_hat
 
+sense = get_sense_hat()
 # config = read_config()
 
 SENSOR = "accelerometer"
