@@ -1,11 +1,7 @@
-import datetime
 import json
 import os
-from typing import Union
-from pydantic import BaseModel
+from parse import Event
 
-# from threading import Thread
-import httpx
 from rainbow_leds import flash_rainbow
 
 from PySiddhi.core.SiddhiManager import SiddhiManager
@@ -13,37 +9,13 @@ from PySiddhi.core.query.output.callback.QueryCallback import QueryCallback
 from PySiddhi.core.util.EventPrinter import PrintEvent
 from fastapi import FastAPI, Request
 
-watch_url = "http://192.168.0.7/post"
+
 app = FastAPI()
 os.environ["SIDDHISDK_HOME"] = f"{os.getcwd()}/../siddhi-sdk-5.1.2"
-# os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64/"
-# os.environ["JVM_HOME"] = "/usr/lib/jvm/java-11-openjdk-amd64"
-# os.environ["JAVA_PATH"] = "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjsig.so"
+
+
 siddhiManager = SiddhiManager()
 query_names = ["test1", "test2"]
-
-
-class Event(BaseModel):
-    device_id: str
-    sensor_id: str
-    sensor_value: Union[float, str]
-    timestamp: int
-
-    @classmethod
-    def from_string(cls, event_str: str) -> "Event":
-        values = event_str.split(" | ")
-        device_id = values[0]
-        sensor_id = values[1]
-        sensor_value = float(values[2])
-        timestamp = int(values[3])
-        return cls(
-            device_id=device_id,
-            sensor_id=sensor_id,
-            sensor_value=sensor_value,
-            timestamp=timestamp,
-        )
-
-
 siddhiAppRuntime = None
 
 
@@ -80,31 +52,17 @@ def startup_event():
 @app.post("/")
 async def recieve_event(request: Request):
     body = await request.body()  # Read the request body
-    message = json.loads(body)["Data"]
-    event = Event.from_string(message)  # Parse the request body as JSON
-    # event = json.loads(body.decode())
-    # event_timestamp = decoded_message.get("Time", "No time provided")
-    # decoded_message["Time"] = datetime.datetime.fromtimestamp(event_timestamp)
-    # print(decoded_message["Time"].strftime("%Y-%m-%d %H:%M:%S"))
+    message = json.loads(body)
+    try:
+        event = Event.from_pi(message)  # if an event comes from a pi
+    except Exception:
+        event = Event.from_watch(message)
 
     inputHandler = siddhiAppRuntime.getInputHandler("cseEventStream")
     inputHandler.send(
         [event.device_id, event.sensor_id, event.sensor_value, event.timestamp]
     )
     print(event)
-
-    # Send a request to the watch
-    # payload = json.dumps({"Data": "Hello from the server"})
-    # headers = {"Content-Type": "application/json"}
-    # response = httpx.post(watch_url, data=payload, headers=headers, timeout=5)
-
-    # if response.status_code == 200:
-    #     print("Request sent to watch successfully")
-    # else:
-    #     print("Failed to send request to watch")
-
-    # return await request.json()
-    # return decoded_message
 
 
 @app.get("/match")
