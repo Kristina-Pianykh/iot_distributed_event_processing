@@ -43,7 +43,7 @@ def set_constants(sensor_id: str) -> dict[str, Any]:
     device_id = os.getenv("DEVICE_ID")
     ips = [
         device_info["ip"]
-        for device, device_info in config["device"].items()
+        for device, device_info in config["pis"].items()
         if device != device_id
     ]
     urls = [f"{config['post_url']}"] + [f"http://{ip}:8000" for ip in ips]
