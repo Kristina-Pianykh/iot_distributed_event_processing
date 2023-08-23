@@ -9,8 +9,11 @@ services:
     # image: piankris/sensor-reader:armv7
     depends_on:
       - fastapi-siddhi
-    environment:
-      - DEVICE_ID=${DEVICE_ID}
+    # environment:
+    #   - DEVICE_ID=${DEVICE_ID}
+    volumes:
+      - ./:/app
+    command: bash /app/launch.sh ${DEVICE_ID}
     # volumes:
     #   - ./sensor-reader:/app
     # Add any additional configuration for the sensor-reader service

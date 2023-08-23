@@ -25,7 +25,7 @@ def send_event(urls: list[str], device_id: str, sensor: str, sensor_val: float) 
 
 def read_config():
     # Open the YAML file and load its content
-    with open("config.yaml", "r") as file:
+    with open("../config.yaml", "r") as file:
         config = yaml.safe_load(file)
         return config
 
