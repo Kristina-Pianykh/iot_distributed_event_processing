@@ -32,7 +32,7 @@ def read_config():
 
 # Some useful constants defined per device
 # retuen a dict with device_id, ips, urls for devices other than yourself
-def set_constants() -> dict[str, Any]:
+def set_constants(sensor_id: str) -> dict[str, Any]:
     config = read_config()
     device_id = os.getenv("DEVICE_ID")
     ips = [
@@ -45,4 +45,7 @@ def set_constants() -> dict[str, Any]:
         "device_id": device_id,
         "ips": ips,
         "urls": urls,
+        "interval": float(
+            config["event"].get(sensor_id, {}).get("data_generation_interval", 0)
+        ),
     }

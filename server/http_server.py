@@ -20,7 +20,7 @@ os.environ["SIDDHISDK_HOME"] = f"{os.getcwd()}/siddhi-sdk-5.1.0"
 # os.environ["JVM_HOME"] = "/usr/lib/jvm/java-11-openjdk-amd64"
 # os.environ["JAVA_PATH"] = "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjsig.so"
 siddhiManager = SiddhiManager()
-query_name = "test"
+query_names = ["test1", "test2"]
 
 
 class Event(BaseModel):
@@ -54,9 +54,9 @@ def startup_event():
     define stream cseEventStream (device_id string, sensor_id string, sensor_value float, timestamp int);
     define stream outputStream (device_id string, sensor_id string, sensor_value float, timestamp int);
 
-    @info(name = '{query_name}')
+    @info(name = 'test1')
     from every e1 = cseEventStream[sensor_id == 'joystick' and sensor_value == 1.0] ->
-                 e2 = cseEventStream[sensor_id == 'joystick' and sensor_value == -1.0 and timestamp - e1.timestamp <= 5000]
+                 e2 = cseEventStream[sensor_id == 'sound' and sensor_value == 1.0 and timestamp - e1.timestamp <= 5000]
     select e1.device_id, e1.sensor_id, e1.sensor_value, e1.timestamp
     insert into outputStream;
     """
@@ -70,7 +70,8 @@ def startup_event():
             PrintEvent(timestamp, inEvents, outEvents)
             flash_rainbow()  # Flash the rainbow LEDs on the watch
 
-    siddhiAppRuntime.addCallback(query_name, QueryCallbackImpl())
+    for query_name in ["test1"]:
+        siddhiAppRuntime.addCallback(query_name, QueryCallbackImpl())
 
     # Starting event processing
     siddhiAppRuntime.start()
@@ -106,12 +107,13 @@ async def recieve_event(request: Request):
     # return decoded_message
 
 
-@app.post("/match")
+@app.get("/match")
 async def flash_lights(request: Request):
     flash_rainbow()
+    return "OK"
 
 
 @app.get("/health")
 async def check_health(request: Request):
     """check if the server is healthy"""
-    return {"status": "healthy"}
+    return "OK"

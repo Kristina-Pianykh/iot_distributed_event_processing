@@ -2,11 +2,11 @@ version: '3.8'
 services:
   sensor-reader:
     privileged: true
-    # build:
-    #   context: .
-    #   dockerfile: ./sensors/Dockerfile
-    # platform: linux/arm/v7
-    image: piankris/sensor-reader:armv7
+    build:
+      context: .
+      dockerfile: ./sensors/Dockerfile
+    platform: linux/arm/v7
+    # image: piankris/sensor-reader:armv7
     depends_on:
       - fastapi-siddhi
     environment:
@@ -16,12 +16,12 @@ services:
     # Add any additional configuration for the sensor-reader service
   
   fastapi-siddhi:
-    image: piankris/fastapi-siddhi:armv7
+    # image: piankris/fastapi-siddhi:armv7
     privileged: true
-    # build:
-    #   context: .
-    #   dockerfile: ./server/Dockerfile
-    # platform: linux/arm/v7
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    platform: linux/arm/v7
     ports:
       - 8000:8000
     # Add any additional configuration for the fastapi-siddhi service

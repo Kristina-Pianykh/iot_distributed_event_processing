@@ -1,16 +1,16 @@
 import yaml
 import time
-from utils import send_event, read_config, set_constants
+from utils import send_event, set_constants
 from sensehat import sense
 
 
-config = read_config()
+# config = read_config()
 
 SENSOR = "joystick"
 
 # device_id = config["device_id"]
-interval = float(config["event"]["joystick"]["data_generation_interval"])
-constants = set_constants()
+# interval = float(config["event"]["joystick"]["data_generation_interval"])
+constants = set_constants(SENSOR)
 
 
 # # setup sensehat
@@ -45,4 +45,4 @@ while True:
                 sensor_val=sensor_value,
             )
             # httpx.post(url, headers=headers, data=json.dumps({"Data": message}))
-        time.sleep(interval)
+        time.sleep(constants["interval"])

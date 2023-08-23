@@ -39,7 +39,7 @@ if [ "$DEVICE_ID" == "pi_3" ]; then
     python3 accelerator.py & PIDS+=($!)
 else
     # Launch in the background
-    python3 sound_stub.py & PIDS+=($!)
+    python3 sound.py & PIDS+=($!)
 fi
 
 # Wait for all background commands to complete

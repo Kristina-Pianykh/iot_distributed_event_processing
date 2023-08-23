@@ -1,16 +1,16 @@
 import time
 import yaml
-from utils import send_event, set_constants, read_config
+from utils import send_event, set_constants
 from sensehat import sense
 
 
-config = read_config()
+# config = read_config()
 
 SENSOR = "humidity_temp_pressure"
 sensors = {"humidity": 0, "temp": 0, "pressure": 0}
 # device_id = config["device_id"]
-interval = float(config["event"][SENSOR]["data_generation_interval"])
-constants = set_constants()
+# interval = float(config["event"][SENSOR]["data_generation_interval"])
+constants = set_constants(SENSOR)
 
 # # setup sensehat
 # sense = SenseHat()
@@ -28,4 +28,4 @@ while True:
                 sensor_val=val,
             )
             sensors[key] = val
-        time.sleep(interval)
+        time.sleep(constants["interval"])

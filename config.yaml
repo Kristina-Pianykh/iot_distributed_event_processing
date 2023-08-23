@@ -1,15 +1,17 @@
 # Devices config
 device:
   pi_3:
-    # ip: "192.168.178.25" # home
-    ip: "192.168.1.143" # uni
+    ip: "192.168.178.25" # home
+    # ip: "192.168.1.143" # uni
+    # ip: "192.168.1.143" # iphone Kris
     sensors:
       - joystick
       - accelerometer
       - humidity_temp_pressure
   pi_4:
-    # ip: "192.168.178.29" # home
-    ip: "192.168.1.144" # uni
+    ip: "192.168.178.29" # home
+    # ip: "192.168.1.144" # uni
+    # ip: "192.168.1.144" # iphone Kris
     sensors:
       - sound
 
@@ -33,6 +35,6 @@ event:
 
   # timestamp in seconds: only hour, minutes, seconds
 
-  # connect to the pis from the laptop:
+  # connect to the pis from the laptop in the lab network:
    # pi3: sshpass -p 45687231 ssh -o StrictHostKeyChecking=no pi@192.168.1.143
    # pi4: sshpass -p 35468432 ssh -o StrictHostKeyChecking=no pi@192.168.1.144
