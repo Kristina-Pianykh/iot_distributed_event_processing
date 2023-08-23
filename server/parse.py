@@ -43,4 +43,4 @@ class Event(BaseModel):
 
 
 config = read_config()
-watch_events = set([event for watch in config["watches"] for event in watch["sensors"]])
+watch_events = set([event for watch in config["watches"] for event in config["watches"][watch]["sensors"]])
