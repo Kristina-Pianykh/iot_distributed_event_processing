@@ -5,6 +5,7 @@ import os
 
 sense_hat_config_path = "/root/.config/sense_hat"
 
+
 def remove_directory(path):
     try:
         for item in os.listdir(path):
@@ -21,7 +22,6 @@ def remove_directory(path):
         print(f"An error occurred: {e}")
 
 
-
 try:
     sense = SenseHat()
 except Exception:
@@ -31,6 +31,7 @@ except Exception:
     except Exception:
         os.remove(sense_hat_config_path)
         sense = SenseHat()
+
 
 def get_sense_hat():
     return sense
