@@ -3,7 +3,7 @@ import time
 import httpx
 import yaml
 
-with open("config.yaml", "r") as file:
+with open("../config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 ip = config["device"]["pi_3"]["ip"]
