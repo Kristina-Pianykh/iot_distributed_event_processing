@@ -36,7 +36,6 @@ RUN git clone https://github.com/siddhi-io/PySiddhi.git \
     && pip install -r Requirements.txt \
     && export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::") \
     && export CPATH=$CPATH:$JAVA_HOME/include:$JAVA_HOME/include/linux:/usr/local/include/python3.10 \
-    && pip install Cython==0.29.36 \
     && python setup.py install
 
 WORKDIR /app
