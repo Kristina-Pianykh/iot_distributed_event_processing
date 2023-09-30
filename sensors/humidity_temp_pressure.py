@@ -1,19 +1,21 @@
 import time
-import yaml
 from utils import send_event, set_constants
-from sensehat import sense
+from sensehat import get_sense_hat
+
+
+sense = get_sense_hat()
 
 
 # config = read_config()
 
 SENSOR = "humidity_temp_pressure"
 sensors = {"humidity": 0, "temp": 0, "pressure": 0}
-# device_id = config["device_id"]
-# interval = float(config["event"][SENSOR]["data_generation_interval"])
 constants = set_constants(SENSOR)
 
-# # setup sensehat
-# sense = SenseHat()
+if constants["frequency"] == "rare":
+    endpoints = constants["urls"] + constants["local_server_url"]
+else:
+    endpoints = constants["local_server_url"]
 
 while True:
     fresh = {"humidity": sense.humidity, "temp": sense.temp, "pressure": sense.pressure}
@@ -22,10 +24,10 @@ while True:
             # message = f"{DEVICE_ID} | {key} | {val} | {int(time.time())}"
             # print(message)
             send_event(
-                urls=constants["urls"],
+                urls=endpoints,
                 device_id=constants["device_id"],
                 sensor=key,
-                sensor_val=val,
+                sensor_val=round(val, 3),
             )
             sensors[key] = val
         time.sleep(constants["interval"])

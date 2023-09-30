@@ -2,11 +2,11 @@ from sense_hat import SenseHat
 import time
 import httpx
 import yaml
+from parse import read_config
 
-with open("config.yaml", "r") as file:
-    config = yaml.safe_load(file)
 
-ip = config["device"]["pi_3"]["ip"]
+config = read_config()
+ip = config["pis"]["pi_3"]["ip"]
 url = f"http://{ip}:8000/match"
 
 
@@ -32,7 +32,7 @@ def flash_rainbow() -> None:
         duration = 0.5
 
         # Loop through the rainbow colors
-        for _ in range(5):
+        for _ in range(1):
             for color in colors:
                 # Set all the LEDs to the current color
                 sense.clear(color)
@@ -45,7 +45,7 @@ def flash_rainbow() -> None:
 
             # Display a blank matrix at the end
             sense.clear()
-            time.sleep(0.5)
-    except OSError:
+            time.sleep(0.2)
+    except Exception:
         print("No Sense HAT detected, sending to another device")
         httpx.get(url)

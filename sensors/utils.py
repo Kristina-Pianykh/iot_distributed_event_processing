@@ -2,8 +2,9 @@ from typing import Any
 import httpx
 import os
 import json
-import time
 import yaml
+import datetime
+
 
 # Set the headers
 headers = {
@@ -11,21 +12,32 @@ headers = {
 }
 
 
-def send_event(urls: list[str], device_id: str, sensor: str, sensor_val: float) -> None:
+def get_time_in_sec() -> int:
+    current_time = datetime.datetime.now()
+    return current_time.minute * 60 + current_time.second
+
+
+def send_event(
+    urls: list[str],
+    device_id: str,
+    sensor: str,
+    sensor_val: float,
+    timestamp: int = get_time_in_sec(),
+) -> None:
     """Send an event to the http server
     and retry if it fails"""
-    message = f"{device_id} | {sensor} | {sensor_val} | {int(time.time())}"
+    message = f"pi | {device_id} | {sensor} | {sensor_val} | {timestamp}"
     # print(message)
     for url in urls:
         try:
-            httpx.post(url, headers=headers, data=json.dumps({"Data": message}))
+            httpx.post(url, headers=headers, data=json.dumps(message))
         except Exception as e:
             print(f"Failed to send event: {message} to {url} with exception: {e}")
 
 
 def read_config():
     # Open the YAML file and load its content
-    with open("config.yaml", "r") as file:
+    with open("../config.yaml", "r") as file:
         config = yaml.safe_load(file)
         return config
 
@@ -37,15 +49,17 @@ def set_constants(sensor_id: str) -> dict[str, Any]:
     device_id = os.getenv("DEVICE_ID")
     ips = [
         device_info["ip"]
-        for device, device_info in config["device"].items()
+        for device, device_info in config["pis"].items()
         if device != device_id
     ]
-    urls = [f"{config['post_url']}"] + [f"http://{ip}:8000" for ip in ips]
+    urls = [f"http://{ip}:8000" for ip in ips]
     return {
         "device_id": device_id,
         "ips": ips,
+        "local_server_url": [config['post_url']],
         "urls": urls,
         "interval": float(
             config["event"].get(sensor_id, {}).get("data_generation_interval", 0)
         ),
+        "frequency": config["pis"][device_id]["sensors"][sensor_id] if sensor_id else None
     }
