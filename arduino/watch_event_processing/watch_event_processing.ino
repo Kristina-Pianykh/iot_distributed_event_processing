@@ -5,15 +5,9 @@
 #include <ctime>
 #include "config.h"
 
-// home Wi-Fi config
-const char* ssid = "Beta Centauri";
-const char* password = "HEtV24c7j6vz";
-const char* serverURL = "http://192.168.0.6:8000";
-
-// Iphone hotspot config
-// const char* ssid = "iPhone (Kris)";
-// const char* password = "123456789km";
-// const char* serverURL = "http://172.20.10.6:8000";
+const char* ssid = "XXX"; // replace with your network name
+const char* password = "XXX"; // replace with your network password
+const char* serverURL = "http://XXX:8000"; // replace with the server IP address in place of XXX
 
 
 AsyncWebServer server(80);
