@@ -17,10 +17,16 @@ def get_time_in_sec() -> int:
     return current_time.minute * 60 + current_time.second
 
 
-def send_event(urls: list[str], device_id: str, sensor: str, sensor_val: float) -> None:
+def send_event(
+    urls: list[str],
+    device_id: str,
+    sensor: str,
+    sensor_val: float,
+    timestamp: int = get_time_in_sec(),
+) -> None:
     """Send an event to the http server
     and retry if it fails"""
-    message = f"pi | {device_id} | {sensor} | {sensor_val} | {get_time_in_sec()}"
+    message = f"pi | {device_id} | {sensor} | {sensor_val} | {timestamp}"
     # print(message)
     for url in urls:
         try:
@@ -46,12 +52,14 @@ def set_constants(sensor_id: str) -> dict[str, Any]:
         for device, device_info in config["pis"].items()
         if device != device_id
     ]
-    urls = [f"{config['post_url']}"] + [f"http://{ip}:8000" for ip in ips]
+    urls = [f"http://{ip}:8000" for ip in ips]
     return {
         "device_id": device_id,
         "ips": ips,
+        "local_server_url": [config['post_url']],
         "urls": urls,
         "interval": float(
             config["event"].get(sensor_id, {}).get("data_generation_interval", 0)
         ),
+        "frequency": config["pis"][device_id]["sensors"][sensor_id] if sensor_id else None
     }

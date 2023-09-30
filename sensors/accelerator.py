@@ -8,12 +8,12 @@ sense = get_sense_hat()
 SENSOR = "accelerometer"
 
 sensors = {"x": 0, "y": 0, "z": 0}
-# device_id = config["device_id"]
-# interval = float(config["event"][SENSOR]["data_generation_interval"])
 constants = set_constants(SENSOR)
 
-# # setup sensehat
-# sense = SenseHat()
+if constants["frequency"] == "rare":
+    endpoints = constants["urls"] + constants["local_server_url"]
+else:
+    endpoints = constants["local_server_url"]
 
 while True:
     acceleration = sense.get_accelerometer_raw()
@@ -23,10 +23,10 @@ while True:
             # message = f"{DEVICE_ID} | accelerometer_{key} | {val} | {int(time.time())}"
             # print(message)
             send_event(
-                urls=constants["urls"],
+                urls=endpoints,
                 device_id=constants["device_id"],
                 sensor=f"accelerometer_{key}",
-                sensor_val=val,
+                sensor_val=round(val, 3),
             )
             # httpx.post(url, headers=headers, data=json.dumps({"Data": message}))
             sensors[key] = val

@@ -8,6 +8,11 @@ sense = get_sense_hat()
 SENSOR = "joystick"
 constants = set_constants(SENSOR)
 
+if constants["frequency"] == "rare":
+    endpoints = constants["urls"] + constants["local_server_url"]
+else:
+    endpoints = constants["local_server_url"]
+
 
 while True:
     for event in sense.stick.get_events():
@@ -31,11 +36,12 @@ while True:
             #     f"{device_id} | {sensor_name} | {sensor_value} | {int(time.time())}"
             # )
             # print(message)
-            send_event(
-                urls=constants["urls"],
-                device_id=constants["device_id"],
-                sensor=SENSOR,
-                sensor_val=sensor_value,
-            )
+            if constants["frequency"] == "rare":
+                send_event(
+                    urls=endpoints,
+                    device_id=constants["device_id"],
+                    sensor=SENSOR,
+                    sensor_val=sensor_value,
+                )
             # httpx.post(url, headers=headers, data=json.dumps({"Data": message}))
         time.sleep(constants["interval"])
