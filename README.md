@@ -54,6 +54,8 @@ This service comprised the logic of hosting an HTTP server that passes data dire
 
 While Siddhi can be integrated with external data stores such as RDBMS, MongoDB, etc., the default behavior is in-memory data storage, which fits our use case. The matching query has to be specified before launching the application but, having said that, it is possible to list multiple matching queries (and subqueries) to select from for each individual device.
 
+Another feature of Siddhi is a variety of different sources that can be used as a producer of events fed to the stream. Among them are HTTP, Kafka, TCP, etc. While the functionality of Siddhi allows for integrating our HTTP listener with the stream, we chose to decouple them for more control over the integration and event pre-processing before it enters the stream.
+
 ## Installation Guide
 
 1. Before you start, make sure you have all the devices connected to one network, otherwise they will not be able to communicate. In order to connect a Raspberry Pi to a local network, modify its network configuration file `/etc/wpa_supplicant/wpa_supplicant.conf` by simply appending a new block to it:
@@ -90,6 +92,11 @@ sudo DEVICE_ID=<pi_id> docker compose up
 The services are set up with logging. It is essential that the applications are launched on all Respberry Pi devices for the service to start sending data. Otherwise, it will be stuck in an infinite loop of waiting for the devices specified in the config to start first.
 
 ![5.jpeg](./documentation/5.jpeg "Connecting")
+
+## Problems
+
+1. The most obvious issue is the armv7 architecture on the Raspberry Pi 4 devices that were available to us. Most (if not all) libraries and packages needed to set up the environment for our application are not available as pre-built binaries for this type of architecture and, for this reason, all of the subdependencies, required for a certain library, have to be built and/or compiled from scratch. That not only led to enormous image build times, but also called for additional installation of required compilers.
+2. The choice of an event processing engine was made too lightly. While it was initially agreed on testing out Siddhi and its original Java implementation might have played out nicer, its Python wrapper is extremely outdated (last update dated 2019) and pooorly packaged (no dependency management in the project, no version tracking). Our current implementation features the FastAPI HTTP server (in Python) tightly coupled with the Siddhi application and in the presence of the Python wrapper for Siddhi, itwas decided to go with Python. To get PySiddhi to work 4 years since its last update with no version tracking of the library's subdependancies, a lot of work had to be done to set up the environment and resolve multiple version conflicts (see the [Dockerfile for the respective service](https://github.com/Kristina-Pianykh/esp32_event_processing/blob/main/server/Dockerfile)). An alternative (and perhaps a better) solution would have been decoupling the HTTP server and the Siddhi application and have them both in Java. Another option would be pivoting to an alternative engine (e.g. [Kafka](https://kafka.apache.org/) or [Arroyo](https://www.arroyo.dev/)).
 
 ## Installation Guide (Smartwatches, out of scope)
 
