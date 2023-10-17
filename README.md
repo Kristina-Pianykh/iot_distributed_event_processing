@@ -1,5 +1,13 @@
 # Distributed Event Processing with Raspberry Pis
 
+- [Design](#design)
+- [Event Distribution](#event-distribution)
+- [Implementation](#implementation)
+- [Sensor Reading Service](#sensor-reading-service)
+- [HTTP Server with Event Processing App](#http-server-with-event-processing-app)
+- [Installation Guide](#installation-guide)
+- [Problem](#problems)
+
 This repository holds the source code for one of the layers in a 2-tier architecture for distriuted event processing in an IoT system. The infstrastructure for the project is intended for capturing and analyzing sensor data in real time between smartwatches, on the one hand, and Raspeby Pis, on the other. The current repository focuses on the latter.
 
 ![1.png](./documentation/1.png "2-layer architecture")
@@ -97,49 +105,3 @@ The services are set up with logging. It is essential that the applications are 
 
 1. The most obvious issue is the armv7 architecture on the Raspberry Pi 4 devices that were available to us. Most (if not all) libraries and packages needed to set up the environment for our application are not available as pre-built binaries for this type of architecture and, for this reason, all of the subdependencies, required for a certain library, have to be built and/or compiled from scratch. That not only led to enormous image build times, but also called for additional installation of required compilers.
 2. The choice of an event processing engine was made too lightly. While it was initially agreed on testing out Siddhi and its original Java implementation might have played out nicer, its Python wrapper is extremely outdated (last update dated 2019) and pooorly packaged (no dependency management in the project, no version tracking). Our current implementation features the FastAPI HTTP server (in Python) tightly coupled with the Siddhi application and in the presence of the Python wrapper for Siddhi, itwas decided to go with Python. To get PySiddhi to work 4 years since its last update with no version tracking of the library's subdependancies, a lot of work had to be done to set up the environment and resolve multiple version conflicts (see the [Dockerfile for the respective service](https://github.com/Kristina-Pianykh/esp32_event_processing/blob/main/server/Dockerfile)). An alternative (and perhaps a better) solution would have been decoupling the HTTP server and the Siddhi application and have them both in Java. Another option would be pivoting to an alternative engine (e.g. [Kafka](https://kafka.apache.org/) or [Arroyo](https://www.arroyo.dev/)).
-
-## Installation Guide (Smartwatches, out of scope)
-
-1. Install `poetry`: [Installation Guide](https://python-poetry.org/docs/#installation).
-
-Note: you might need to use python ^3.10.
-
-2. Install python dependencies:
-
-```bash
-poetry install
-```
-
-3. Start the server:
-
-```bash
-poetry run poe start
-```
-
-4. Open the `./arduino/watch_event_processing` in Arduino IDE
-5. Upload the sketch to the watch
-
-## Watch Events:
-
-1. Click event
-2. Toggle event (combined with `1`)
-3. Rotation events (2-dimensional)
-
-## Run on a Pi
-
-1. Install `Docker` and `docker compose` by running
-
-```bash
-./install_docker.sh
-```
-
-2. Start the services with
-
-```bash
-sudo DEVICE_ID=<pi_id> docker compose up
-```
-
-where `pi_id` is the ID of the current rasberry pi.
-
-It spins up two services: (a) the fastapi http server with the event processing app Siddhi and (b) the service to reads sensor data from the pi and send it to the http server
-
